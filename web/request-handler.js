@@ -30,14 +30,14 @@ exports.handleRequest = function (req, res) {
 
 // -----------------------------------
   req.on('data', function(chunk) {
-    if (req.method === 'POST' && req.url === '/getURL') {
+    if (req.method === 'POST' && req.url === '/') {
       data += chunk;
     }
   });
 
 
   req.on('end', function() {
-    if (req.method === 'POST' && req.url === '/getURL') {
+    if (req.method === 'POST' && req.url === '/') {
       console.log('DATA', data);
     }
     data = '';

@@ -66,7 +66,7 @@ describe("Node Server Request Listener Function", function() {
   it("Should append submitted sites to 'sites.txt'", function(done) {
     var url = "www.example.com";
     var req = new stubs.Request("/", "POST", {url: url});
-
+    console.log(req);
     // Reset the test file and process request
     fs.writeFileSync(archive.paths.list, "");
     handler.handleRequest(req, res);
