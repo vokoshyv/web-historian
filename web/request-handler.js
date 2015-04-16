@@ -1,7 +1,52 @@
 var fs = require('fs');
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
-// require more modules/folders here!
+
+
+// loosely based on:
+// http://stackoverflow.com/questions/5294470/node-js-writing-image-to-local-server
+var http = require('http')
+  , fs = require('fs')
+  , options
+
+options = {
+    host: 'www.google.com'
+  , port: 80
+  , path: '/'
+}
+
+http.get(options, function(res){
+    var imagedata = ''
+    res.setEncoding('binary')
+
+    res.on('data', function(chunk){
+        imagedata += chunk
+    })
+
+    res.on('end', function(){
+        fs.writeFile('archives/sites/google.html', imagedata, 'binary', function(err){
+            if (err) throw err
+            console.log('File saved.')
+        })
+    })
+
+})
+
+
+
+// var hr = require('node_modules/http-request');
+// // require more modules/folders here!
+
+
+// hr.get('google.com', "archives/sites/GOOGLETEST",function (err, res) {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+
+//   console.log("GOOOOOOOOGLE", res.code, res.headers, res.file);
+// });
+
 
 // var storage = []
 // -----------------------------------
