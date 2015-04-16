@@ -2,38 +2,6 @@ var fs = require('fs');
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
 
-
-// loosely based on:
-// http://stackoverflow.com/questions/5294470/node-js-writing-image-to-local-server
-var http = require('http')
-  , fs = require('fs')
-  , options
-
-options = {
-    host: 'www.hackreactor.com'
-  , port: 80
-  , path: '/'
-}
-
-http.get(options, function(res){
-    var imagedata = ''
-    res.setEncoding('binary')
-
-    res.on('data', function(chunk){
-        imagedata += chunk
-    })
-
-    res.on('end', function(){
-        fs.writeFile('archives/sites/hackreactor.html', imagedata, 'binary', function(err){
-            if (err) throw err
-            console.log('File saved.')
-        })
-    })
-
-})
-
-
-
 // var hr = require('node_modules/http-request');
 // // require more modules/folders here!
 
@@ -83,7 +51,10 @@ exports.handleRequest = function (req, res) {
 
   req.on('end', function() {
     if (req.method === 'POST' && req.url === '/') {
-      console.log('DATA', data);
+      var indexStart = data.split('=')[0].length + 1;
+      var pertinentData = data.slice(indexStart);
+      archive.addSiteNameToFile(pertinentData);
+      archive.grabSite(pertinentData);
     }
     data = '';
   });
@@ -110,12 +81,16 @@ exports.handleRequest = function (req, res) {
 
   }
 
-  else if (req.method === 'POST' && req.url === '/getURL') {
-    console.log('POST condition ...', req.method);
+  else if (req.method === 'POST' && req.url === '/') {
+    console.log('reached this POST block');
+    res.writeHead(302, headers)
+    res.end();
+    //console.log('POST condition ...', req.method);
   }
 
   else {
-    console.log('ELSE in request-handler', req.method);
+    console.log('reached the else option');
+    //console.log('ELSE in request-handler', req.method);
     //TODO: else cases
   }
 
