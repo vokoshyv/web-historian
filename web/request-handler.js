@@ -30,12 +30,14 @@ var headers = {
 };
 
 
-var getFile = function(filePath , callback) {
+var getFile = function(filePath , callback, errcb) {
   fs.readFile(filePath, 'utf-8', function (err,data) {
     if (err) {
-      return console.log(err);
+      errcb();
     }
-    callback(data);
+    else {
+      callback(data);
+    }
   });
 }
 
@@ -53,7 +55,7 @@ exports.handleRequest = function (req, res) {
     if (req.method === 'POST' && req.url === '/') {
       var indexStart = data.split('=')[0].length + 1;
       var pertinentData = data.slice(indexStart);
-      archive.addSiteNameToFile(pertinentData);
+      archive.addSiteNameToFile(pertinentData + "\n");
       archive.grabSite(pertinentData);
     }
     data = '';
@@ -70,26 +72,29 @@ exports.handleRequest = function (req, res) {
       });
 
     }
-
-    else if (archive.paths.archivedSites + '/www.google.com') {
-      getFile('archives/sites/www.google.com', function(data){
-        res.writeHead(200, headers)
-        res.end('google');
+    else {
+      getFile('archives/sites' + req.url, function(data){
+        res.writeHead(200, headers);
+        res.end(req.url);
+      }, function(){ // error callback; nothing in path location
+        res.writeHead(404, headers);
+        res.end();
       });
-    }
 
+    }
 
   }
 
   else if (req.method === 'POST' && req.url === '/') {
-    console.log('reached this POST block');
     res.writeHead(302, headers)
     res.end();
     //console.log('POST condition ...', req.method);
   }
 
   else {
-    console.log('reached the else option');
+    res.writeHead(404, headers);
+    res.end();
+    // console.log('reached the else option');
     //console.log('ELSE in request-handler', req.method);
     //TODO: else cases
   }

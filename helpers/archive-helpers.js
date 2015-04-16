@@ -61,7 +61,7 @@ exports.grabSite = function(site) {
       })
 
       res.on('end', function(){
-          fs.writeFile('archives/sites/' + site + '.html', data, 'binary', function(err){
+          fs.writeFile(this.paths.archivedSites + '/' + site + '.html', data, 'binary', function(err){
               if (err) throw err
           })
       })
@@ -71,7 +71,7 @@ exports.grabSite = function(site) {
 };
 
 exports.addSiteNameToFile = function(siteName) {
-  fs.appendFile('archives/sites.txt', siteName + "\n", function (err) {
+  fs.appendFile(this.paths.list, siteName, function (err) {
     if (err) throw err;
   });
 };
