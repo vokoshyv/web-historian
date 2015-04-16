@@ -10,7 +10,7 @@ var http = require('http')
   , options
 
 options = {
-    host: 'www.google.com'
+    host: 'www.hackreactor.com'
   , port: 80
   , path: '/'
 }
@@ -24,7 +24,7 @@ http.get(options, function(res){
     })
 
     res.on('end', function(){
-        fs.writeFile('archives/sites/google.html', imagedata, 'binary', function(err){
+        fs.writeFile('archives/sites/hackreactor.html', imagedata, 'binary', function(err){
             if (err) throw err
             console.log('File saved.')
         })
