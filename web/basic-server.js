@@ -3,7 +3,8 @@ var handler = require("./request-handler");
 var initialize = require("./initialize.js");
 
 // Why do you think we have this here?
-// HINT:It has to do with what's in .gitignore
+// HINT:It has to do with what's in .
+// Want to ignore the files in our archive when pushing to GitHub
 initialize();
 
 var port = 8080;

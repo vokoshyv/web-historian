@@ -57,7 +57,6 @@ describe("Node Server Request Listener Function", function() {
       function(){
         expect(res._responseCode).to.equal(200);
         expect(res._data.toString().match(/google/)).to.be.ok; // the resulting html should have the text "google"
-
         // Delete the file from the archives.
         fs.unlinkSync(fixturePath);
         done();
