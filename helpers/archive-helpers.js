@@ -42,7 +42,7 @@ exports.isURLArchived = function(){
 exports.downloadUrls = function(){
 };
 
-exports.grabSite = function(site) {
+exports.grabSite = function(site, ourRes) {
 
   // loosely based on:
   // http://stackoverflow.com/questions/5294470/node-js-writing-image-to-local-server
@@ -65,10 +65,12 @@ exports.grabSite = function(site) {
           fs.writeFile("archives/sites" + '/' + site + '.html', data, 'binary', function(err){
               if (err) throw err
           })
+        ourRes.writeHead(302, {'Location': 'http://127.0.0.1:8080/loading.html'});
+        ourRes.end();
+
       })
 
   })
-
 };
 
 exports.addSiteNameToFile = function(siteName) {

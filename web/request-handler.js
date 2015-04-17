@@ -16,7 +16,6 @@ var archive = require('../helpers/archive-helpers');
 // });
 
 
-// var storage = []
 // -----------------------------------
 var data = '', chunk = '';
 // -----------------------------------
@@ -30,10 +29,10 @@ var headers = {
 };
 
 
-var getFile = function(filePath , callback, errcb) {
+var getFile = function(filePath , callback) {
   fs.readFile(filePath, 'utf-8', function (err,data) {
     if (err) {
-      errcb();
+      console.log(err);
     }
     else {
       callback(data);
@@ -41,10 +40,32 @@ var getFile = function(filePath , callback, errcb) {
   });
 }
 
+var storage = [];
+
 exports.handleRequest = function (req, res) {
 
   var specialURL;
 // -----------------------------------
+  var indexStart = req.url.split('=')[0].length + 1;
+  var pertinentData = req.url.slice(indexStart);
+  console.log('pertinentData:', pertinentData);
+
+
+
+  // if (storage.indexOf(pertinentData)>-1){
+  // }
+  // // else {
+  //   console.log('ENTERED HERE');
+  //   getFile('web/public/loading.html', function(data){
+  //     console.log('Made it here');
+  //     res.writeHead(302, headers)
+  //     res.end(data);
+  //     console.log('DATA', data);
+  //     // res.end('MadeIt');
+  //   });
+  // }
+
+
   req.on('data', function(chunk) {
     if (req.method === 'POST' && req.url === '/') {
       data += chunk;
@@ -59,7 +80,7 @@ exports.handleRequest = function (req, res) {
       var pertinentData = data.slice(indexStart);
 
       archive.addSiteNameToFile(pertinentData + "\n");
-      archive.grabSite(pertinentData);
+      archive.grabSite(pertinentData, res);
       //data = '';
     }
     else {
@@ -72,6 +93,7 @@ exports.handleRequest = function (req, res) {
 
   if (req.method === 'GET') {
     if (req.url === '/') {
+
       getFile('web/public/index.html', function(data){
         res.writeHead(200, headers)
         res.end(data);
@@ -80,8 +102,17 @@ exports.handleRequest = function (req, res) {
     }
     else if (req.url === '/loading.html'){
       getFile('web/public/loading.html', function(data){
-        res.writeHead(200, headers)
+        console.log('Made it here');
+        res.writeHead(302, headers)
         res.end(data);
+        console.log('DATA', data);
+        // res.end('MadeIt');
+      });
+
+
+      getFile('archives/sites/' + pertinentData + '.html', function(data){
+                res.writeHead(200, headers)
+                res.end(data);
       });
 
     }
@@ -93,17 +124,64 @@ exports.handleRequest = function (req, res) {
         var pertinentData = req.url.slice(indexStart);
         console.log(pertinentData);
 
+
         // regexp of pertinentData within sites.txt
-        if () {
-          //then we will getFile of the webpage inside archives/sites
-        }
-        else {
-          //direct user to loading page
-          getFile('web/public/loading.html', function(data){
-            res.writeHead(200, headers)
-            res.end(data);
-          });
-        }
+        fs.readFile(archive.paths.list, 'utf-8', function (err,data) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+
+            if (data.indexOf(pertinentData)>-1) {
+              getFile('archives/sites/' + pertinentData + '.html', function(data){
+                res.writeHead(200, headers)
+                res.end(data);
+              }, function(){console.log(err);});
+              //then we will getFile of the webpage inside archives/sites
+            }
+            else {
+              console.log("going inside here on not recorded site")
+              // res.writeHead(302, {'Location': 'http://127.0.0.1:8080/loading.html'});
+              // res.end();
+
+              archive.addSiteNameToFile(pertinentData + "\n");
+              archive.grabSite(pertinentData, res);
+
+              //direct user to loading page
+              // getFile('web/public/loading.html', function(data){
+              //   res.writeHead(200, headers);
+              //   res.end(data);
+              // });
+            }
+
+          }
+        });
+
+        // getFile(archive.paths.list, function(data){
+        //   if (data.indexOf(pertinentData)>-1) {
+        //     getFile('archives/sites' + pertinentData + '.html', function(data){
+        //       res.writeHead(200, headers)
+        //       res.end(data);
+        //     });
+        //     //then we will getFile of the webpage inside archives/sites
+        //   }
+        //   else {
+        //     //direct user to loading page
+        //     getFile('web/public/loading.html', function(data){
+        //       res.writeHead(200, headers)
+        //       res.end(data);
+        //     });
+        //   }
+        // }, function(){ // error callback; nothing in path location
+        //   console.log('ERR', err);
+        //   res.writeHead(404, headers);
+        //   res.end();
+
+        // });
+
+
+
+
 
       }
       else {
@@ -125,9 +203,9 @@ exports.handleRequest = function (req, res) {
 
 
     // Conditional async testing, akin to Jasmine's waitsFor()
-    setTimeout(function() {
-      console.log('Im READY!!!',data);
-    }, 1000);
+    // setTimeout(function() {
+    //   console.log('Im READY!!!',data);
+    // }, 1000);
 
 
     // req.on('data', function(chunk) {
