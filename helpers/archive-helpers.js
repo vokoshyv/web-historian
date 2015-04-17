@@ -26,7 +26,8 @@ exports.initialize = function(pathsObj){
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(){
+exports.readListOfUrls = function(callback){
+  callback(["example1.com", "example2.com"]);
 };
 
 exports.isUrlInList = function(){
@@ -61,7 +62,7 @@ exports.grabSite = function(site) {
       })
 
       res.on('end', function(){
-          fs.writeFile(this.paths.archivedSites + '/' + site + '.html', data, 'binary', function(err){
+          fs.writeFile("archives/sites" + '/' + site + '.html', data, 'binary', function(err){
               if (err) throw err
           })
       })

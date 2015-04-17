@@ -43,6 +43,7 @@ var getFile = function(filePath , callback, errcb) {
 
 exports.handleRequest = function (req, res) {
 
+  var specialURL;
 // -----------------------------------
   req.on('data', function(chunk) {
     if (req.method === 'POST' && req.url === '/') {
@@ -51,17 +52,22 @@ exports.handleRequest = function (req, res) {
   });
 
 
+
   req.on('end', function() {
     if (req.method === 'POST' && req.url === '/') {
       var indexStart = data.split('=')[0].length + 1;
       var pertinentData = data.slice(indexStart);
+
       archive.addSiteNameToFile(pertinentData + "\n");
       archive.grabSite(pertinentData);
+      //data = '';
     }
-    data = '';
+    else {
+      data = '';
+    }
+
   });
 // -----------------------------------
-
 
 
   if (req.method === 'GET') {
@@ -72,30 +78,74 @@ exports.handleRequest = function (req, res) {
       });
 
     }
-    else {
-      getFile('archives/sites' + req.url, function(data){
-        res.writeHead(200, headers);
-        res.end(req.url);
-      }, function(){ // error callback; nothing in path location
-        res.writeHead(404, headers);
-        res.end();
+    else if (req.url === '/loading.html'){
+      getFile('web/public/loading.html', function(data){
+        res.writeHead(200, headers)
+        res.end(data);
       });
+
+    }
+    else {
+      console.log('***SUPERLOG***:', req.method, req.url);
+
+      if (req.url.split('=')[0] === '/?url') {
+        var indexStart = req.url.split('=')[0].length + 1;
+        var pertinentData = req.url.slice(indexStart);
+        console.log(pertinentData);
+
+        // regexp of pertinentData within sites.txt
+        if () {
+          //then we will getFile of the webpage inside archives/sites
+        }
+        else {
+          //direct user to loading page
+          getFile('web/public/loading.html', function(data){
+            res.writeHead(200, headers)
+            res.end(data);
+          });
+        }
+
+      }
+      else {
+        getFile('archives/sites' + req.url, function(data){
+          res.writeHead(200, headers);
+          res.end(req.url);
+        }, function(){ // error callback; nothing in path location
+          res.writeHead(404, headers);
+          res.end();
+        });
+
+      }
+
 
     }
 
   }
-
   else if (req.method === 'POST' && req.url === '/') {
-    res.writeHead(302, headers)
-    res.end();
-    //console.log('POST condition ...', req.method);
-  }
 
+
+    // Conditional async testing, akin to Jasmine's waitsFor()
+    setTimeout(function() {
+      console.log('Im READY!!!',data);
+    }, 1000);
+
+
+    // req.on('data', function(chunk) {
+    //   if (req.method === 'POST' && req.url === '/') {
+    //     data += chunk;
+    //   }
+    // });
+    // console.log(data);
+
+
+
+
+    res.writeHead(302, {'Location': 'http://127.0.0.1:8080/loading.html'});
+    res.end();
+  }
   else {
     res.writeHead(404, headers);
     res.end();
-    // console.log('reached the else option');
-    //console.log('ELSE in request-handler', req.method);
     //TODO: else cases
   }
 
